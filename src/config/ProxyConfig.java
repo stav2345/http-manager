@@ -91,9 +91,7 @@ public class ProxyConfig {
 		try(InputStream stream = new FileInputStream(filename)) {
 			properties.loadFromXML(stream);
 		}
-		catch (IOException e) {
-			System.err.println("The " + filename + " file was not found. Please check!");
-		}
+		catch (IOException e) {}
 
 		return properties;
 	}
