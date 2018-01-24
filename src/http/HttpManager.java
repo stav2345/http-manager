@@ -13,6 +13,9 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.btr.proxy.search.ProxySearch;
 import com.btr.proxy.search.ProxySearch.Strategy;
 
@@ -21,6 +24,8 @@ import proxy.ProxyConfigException;
 
 public class HttpManager {
 
+	private static final Logger LOGGER = LogManager.getLogger(HttpManager.class);
+	
 	/**
 	 * Open an http connection with the endpoint
 	 * @param endpoint
@@ -62,8 +67,9 @@ public class HttpManager {
 	    
 	    int status = con.getResponseCode();
 	    
+	    LOGGER.info("Response code=" + status);
+	    
 	    if (status != HttpURLConnection.HTTP_OK) {
-		    System.out.println("Error: response status " + status);
 	    	return null;
 	    }
 	    
@@ -78,7 +84,7 @@ public class HttpManager {
 	    
 	    con.disconnect();
 	    
-	    System.out.println(result.toString());
+	    LOGGER.debug("Response contents=" + result.toString());
 	    
 	    return result.toString();
 	}
@@ -117,6 +123,7 @@ public class HttpManager {
 		
 		// automatically detect proxy if empty port or hostname
 		if ((hostname == null || hostname.isEmpty()) || (port == null || port.isEmpty())) {
+			LOGGER.error("Wrong configuration for the proxy hostname or port. Found hostname=" + hostname + ", port=" + port);
 			throw new ProxyConfigException("hostname: " + hostname + ", port: " + port);
 		}
 		
@@ -129,6 +136,7 @@ public class HttpManager {
 		}
 		catch(NumberFormatException e) {
 			e.printStackTrace();
+			LOGGER.error("Wrong configuration for the proxy port. Expected number, found port=" + port, e);
 			throw new ProxyConfigException("hostname: " + hostname + ", port: " + port);
 		}
 	}
@@ -138,6 +146,8 @@ public class HttpManager {
 	 * @return
 	 */
 	public static Proxy detectProxy() {
+		
+		LOGGER.info("Automatic detection of proxy...");
 		
 		System.setProperty("java.net.useSystemProxies","true");
 		
@@ -159,6 +169,7 @@ public class HttpManager {
 			testUri = new URI("http://java.sun.com/");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
+			LOGGER.error("Wrong test URI for searching automatically proxies", e);
 		}
 		
 		if (testUri == null) {
@@ -171,17 +182,17 @@ public class HttpManager {
 
             Proxy proxy = iter.next();
 
-            System.out.println("proxy hostname : " + proxy.type());
+            LOGGER.debug("Proxy hostname : " + proxy.type());
 
             InetSocketAddress addr = (InetSocketAddress)proxy.address();
 
             if(addr == null) {
-                System.out.println("No Proxy");
+            	LOGGER.info("No Proxy found");
             } else {
 
             	// proxy found
-                System.out.println("proxy hostname : " + addr.getHostName());
-                System.out.println("proxy port : " + addr.getPort());
+            	LOGGER.info("Proxy hostname : " + addr.getHostName());
+            	LOGGER.info("Proxy port : " + addr.getPort());
 
                 return proxy;
             }
