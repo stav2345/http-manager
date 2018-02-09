@@ -70,7 +70,7 @@ public class HttpManager {
 	    LOGGER.info("Response code=" + status);
 	    
 	    if (status != HttpURLConnection.HTTP_OK) {
-	    	return null;
+	    	throw new IOException("Bad response, found=" + status);
 	    }
 	    
 	    BufferedReader rd = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -129,9 +129,13 @@ public class HttpManager {
 		
 		try {
 			int portInt = Integer.valueOf(port);
-			
-			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(hostname, portInt));
-			
+			Proxy proxy;
+			try {
+				proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(hostname, portInt));
+			}
+			catch(IllegalArgumentException e) {
+				throw new ProxyConfigException(e);
+			}
 			return proxy;
 		}
 		catch(NumberFormatException e) {

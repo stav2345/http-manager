@@ -5,15 +5,17 @@ import org.apache.log4j.Logger;
 
 public enum ProxyMode {
 	
-	NO_PROXY("NO_PROXY"),
-	AUTO("AUTO"),
-	MANUAL("MANUAL");
+	NO_PROXY("NO_PROXY", "None"),
+	AUTO("AUTO", "Automatic detection"),
+	MANUAL("MANUAL", "Manual setting");
 	
 	private static final Logger LOGGER = LogManager.getLogger(ProxyMode.class);
 	private String keyword;
+	private String label;
 	
-	ProxyMode(String keyword) {
+	ProxyMode(String keyword, String label) {
 		this.keyword = keyword;
+		this.label = label;
 	}
 	
 	public static ProxyMode fromString(String keyword) {
@@ -25,5 +27,18 @@ public enum ProxyMode {
 		
 		LOGGER.warn("No valid proxy mode found, using NO_PROXY");
 		return NO_PROXY;
+	}
+	
+	public String getKeyword() {
+		return keyword;
+	}
+	
+	public String getLabel() {
+		return label;
+	}
+	
+	@Override
+	public String toString() {
+		return getLabel();
 	}
 }

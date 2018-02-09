@@ -1,6 +1,9 @@
 package config;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -33,6 +36,28 @@ public class ProxyConfig {
 	}
 
 	public ProxyConfig() {}
+	
+	/**
+	 * Check if the configuration file is in the
+	 * current folder or in the parent folder
+	 * @return
+	 */
+	private boolean isInCurrentFolder() {
+		File file = new File(PROXY_CONFIG_PATH);
+		return file.exists();
+	}
+	
+	/**
+	 * Get the path where the config file is
+	 * stored
+	 * @return
+	 */
+	private String getPath() {
+		if (isInCurrentFolder())
+			return PROXY_CONFIG_PATH;
+		else
+			return PARENT_PROXY_CONFIG_PATH;
+	}
 	
 	public String getConfigPath() {
 		return this.PROXY_CONFIG_PATH;
@@ -80,6 +105,21 @@ public class ProxyConfig {
 		return ProxyMode.fromString(mode);
 	}
 	
+	public void setProxyMode(ProxyMode mode) {
+		String config = getPath();
+		setValue(config, PROXY_MODE, mode.getKeyword());
+	}
+	
+	public void setProxyHostname(String hostname) {
+		String config = getPath();
+		setValue(config, PROXY_HOST_NAME, hostname);
+	}
+	
+	public void setProxyPort(String port) {
+		String config = getPath();
+		setValue(config, PROXY_PORT, port);
+	}
+	
 	/**
 	 * Read the application properties from the xml file
 	 * @return
@@ -106,5 +146,24 @@ public class ProxyConfig {
 		String value = prop.getProperty(property);
 		
 		return value;
+	}
+	
+	/**
+	 * Set a value in the file
+	 * @param propertiesFilename
+	 * @param property
+	 * @param value
+	 */
+	private void setValue(String propertiesFilename, String property, String value) {
+		Properties prop = getProperties(propertiesFilename);
+		prop.setProperty(property, value);
+		
+		try(FileOutputStream outputStream = new FileOutputStream(propertiesFilename);) {
+			prop.storeToXML(outputStream, null);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
