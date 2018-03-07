@@ -63,21 +63,24 @@ public class ProxyConfig {
 		return this.PROXY_CONFIG_PATH;
 	}
 	
-	private String getFromParent(String key) {
+	private String getFromParent(String key) throws IOException {
 		return getValue(PARENT_PROXY_CONFIG_PATH, key);
 	}
 	
 	/**
 	 * Get customized proxy hostname
 	 * @return
+	 * @throws IOException 
 	 */
-	public String getProxyHostname() {
+	public String getProxyHostname() throws IOException {
 		
-		String name = getValue(PROXY_CONFIG_PATH, PROXY_HOST_NAME);
-		
-		if (name == null)
-			return getFromParent(PROXY_HOST_NAME);
-		
+		String name;
+		try {
+			name = getValue(PROXY_CONFIG_PATH, PROXY_HOST_NAME);
+		} catch (IOException e) {
+			name = getFromParent(PROXY_HOST_NAME);
+		}
+
 		return name;
 	}
 	
@@ -85,37 +88,42 @@ public class ProxyConfig {
 	 * Get customized proxy port
 	 * @return
 	 */
-	public String getProxyPort() {
+	public String getProxyPort() throws IOException {
 		
-		String port = getValue(PROXY_CONFIG_PATH, PROXY_PORT);
-		
-		if (port == null)
-			return getFromParent(PROXY_PORT);
+		String port;
+		try {
+			port = getValue(PROXY_CONFIG_PATH, PROXY_PORT);
+		}
+		catch (IOException e) {
+			port = getFromParent(PROXY_PORT);
+		}
 		
 		return port;
 	}
 	
-	public ProxyMode getProxyMode() {
+	public ProxyMode getProxyMode() throws IOException {
 		
-		String mode = getValue(PROXY_CONFIG_PATH, PROXY_MODE);
-		
-		if (mode == null)
+		String mode;
+		try {
+			mode = getValue(PROXY_CONFIG_PATH, PROXY_MODE);
+		} catch (IOException e) {
 			mode = getFromParent(PROXY_MODE);
+		}
 
 		return ProxyMode.fromString(mode);
 	}
 	
-	public void setProxyMode(ProxyMode mode) {
+	public void setProxyMode(ProxyMode mode) throws IOException {
 		String config = getPath();
 		setValue(config, PROXY_MODE, mode.getKeyword());
 	}
 	
-	public void setProxyHostname(String hostname) {
+	public void setProxyHostname(String hostname) throws IOException {
 		String config = getPath();
 		setValue(config, PROXY_HOST_NAME, hostname);
 	}
 	
-	public void setProxyPort(String port) {
+	public void setProxyPort(String port) throws IOException {
 		String config = getPath();
 		setValue(config, PROXY_PORT, port);
 	}
@@ -123,20 +131,21 @@ public class ProxyConfig {
 	/**
 	 * Read the application properties from the xml file
 	 * @return
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public Properties getProperties(String filename) {
+	public Properties getProperties(String filename) throws IOException {
 		
 		Properties properties = new Properties();
 
 		try(InputStream stream = new FileInputStream(filename)) {
 			properties.loadFromXML(stream);
 		}
-		catch (IOException e) {}
 
 		return properties;
 	}
 	
-	private String getValue(String propertiesFilename, String property) {
+	private String getValue(String propertiesFilename, String property) throws IOException {
 		
 		Properties prop = getProperties(propertiesFilename);
 		
@@ -153,17 +162,15 @@ public class ProxyConfig {
 	 * @param propertiesFilename
 	 * @param property
 	 * @param value
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	private void setValue(String propertiesFilename, String property, String value) {
+	private void setValue(String propertiesFilename, String property, String value) throws IOException {
 		Properties prop = getProperties(propertiesFilename);
 		prop.setProperty(property, value);
 		
 		try(FileOutputStream outputStream = new FileOutputStream(propertiesFilename);) {
 			prop.storeToXML(outputStream, null);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 }

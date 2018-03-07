@@ -99,16 +99,21 @@ public class HttpManager {
 		ProxyConfig config = new ProxyConfig();
 		
 		Proxy proxy = null;
-		switch(config.getProxyMode()) {
-		case NO_PROXY:
-			proxy = null;
-			break;
-		case AUTO:
-			proxy = detectProxy();
-			break;
-		case MANUAL:
-			proxy = getManualProxy();
-			break;
+		try {
+			switch(config.getProxyMode()) {
+			case NO_PROXY:
+				proxy = null;
+				break;
+			case AUTO:
+				proxy = detectProxy();
+				break;
+			case MANUAL:
+				proxy = getManualProxy();
+				break;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new ProxyConfigException(e);
 		}
 		
 		return proxy;
@@ -118,8 +123,20 @@ public class HttpManager {
 		
 		ProxyConfig config = new ProxyConfig();
 		
-		String hostname = config.getProxyHostname();
-		String port = config.getProxyPort();
+		String hostname;
+		try {
+			hostname = config.getProxyHostname();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			hostname = "";
+		}
+		String port;
+		try {
+			port = config.getProxyPort();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			port = "";
+		}
 		
 		// automatically detect proxy if empty port or hostname
 		if ((hostname == null || hostname.isEmpty()) || (port == null || port.isEmpty())) {
