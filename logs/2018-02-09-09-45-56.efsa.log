@@ -1,5 +1,0 @@
-2018-02-09 09:46:22,452 INFO h.HttpManager [AWT-EventQueue-0] Automatic detection of proxy...
-2018-02-09 09:46:24,570 INFO h.HttpManager [AWT-EventQueue-0] Proxy hostname : 10.0.199.5
-2018-02-09 09:46:24,570 INFO h.HttpManager [AWT-EventQueue-0] Proxy port : 8080
-2018-02-09 09:46:38,729 INFO h.HttpManager [AWT-EventQueue-0] Response code=200
-2018-02-09 09:46:46,277 INFO h.HttpManager [AWT-EventQueue-0] Response code=200
