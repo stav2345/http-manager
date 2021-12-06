@@ -22,8 +22,10 @@ import  com.github.markusbernhardt.proxy.ProxySearch.Strategy;
 import config.ProxyConfig;
 import proxy.ProxyConfigException;
 
-public class HttpManager {
+import proxy.GenericAuthenticator;
 
+public class HttpManager {
+	private static final GenericAuthenticator ga = new GenericAuthenticator();
 	private static final Logger LOGGER = LogManager.getLogger(HttpManager.class);
 	
 	/**
@@ -153,6 +155,7 @@ public class HttpManager {
 			catch(IllegalArgumentException e) {
 				throw new ProxyConfigException(e);
 			}
+			ga.setProxyDetails(hostname, port);
 			return proxy;
 		}
 		catch(NumberFormatException e) {
@@ -214,7 +217,8 @@ public class HttpManager {
             	// proxy found
             	LOGGER.info("Proxy hostname : " + addr.getHostName());
             	LOGGER.info("Proxy port : " + addr.getPort());
-
+		
+		ga.setProxyDetails(addr.getHostName(), String.valueOf(addr.getPort()));
                 return proxy;
             }
         }
