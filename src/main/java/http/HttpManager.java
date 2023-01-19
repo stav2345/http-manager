@@ -112,6 +112,7 @@ public class HttpManager {
 				break;
 			}
 		} catch (IOException e) {
+			LOGGER.error("Error in getting proxy: ", e);
 			e.printStackTrace();
 			throw new ProxyConfigException(e);
 		}
@@ -127,6 +128,7 @@ public class HttpManager {
 		try {
 			hostname = config.getProxyHostname();
 		} catch (IOException e1) {
+			LOGGER.error("Error in getting proxy hostname: ", e1);
 			e1.printStackTrace();
 			hostname = "";
 		}
@@ -134,6 +136,7 @@ public class HttpManager {
 		try {
 			port = config.getProxyPort();
 		} catch (IOException e1) {
+			LOGGER.error("Error in getting proxy port: ", e1);
 			e1.printStackTrace();
 			port = "";
 		}
@@ -151,13 +154,14 @@ public class HttpManager {
 				proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(hostname, portInt));
 			}
 			catch(IllegalArgumentException e) {
+				LOGGER.error("Error in setting proxy: ", e);
 				throw new ProxyConfigException(e);
 			}
 			return proxy;
 		}
 		catch(NumberFormatException e) {
-			e.printStackTrace();
 			LOGGER.error("Wrong configuration for the proxy port. Expected number, found port=" + port, e);
+			e.printStackTrace();
 			throw new ProxyConfigException("hostname: " + hostname + ", port: " + port);
 		}
 	}
@@ -189,8 +193,8 @@ public class HttpManager {
 		try {
 			testUri = new URI("http://java.sun.com/");
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
 			LOGGER.error("Wrong test URI for searching automatically proxies", e);
+			e.printStackTrace();
 		}
 		
 		if (testUri == null) {
